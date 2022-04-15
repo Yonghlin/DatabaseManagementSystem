@@ -1,6 +1,9 @@
 DBMS Programming Assignment 2
+
 Created by Brennan Mulligan, Yong Lin, Makaylie Lucas, Mason Weyant
+
 FOR Database Management Systems
+
 Shippensburg University
 
 Instructions:
