@@ -1,4 +1,5 @@
 import java.sql.*;
+import java.util.Random;
 import java.util.Scanner;
 
 public class BuildTable {
@@ -32,7 +33,7 @@ public class BuildTable {
     int input = 0;
     activateJDBC();
 
-    System.out.println("Would you like to create the tables (1) or drop the tables (0)?");
+    System.out.println("Would you like to Drop the tables (0), Create the tables (1), or Fill Tables (2)?");
     System.out.println("Enter -1 to quit");
     input = scanner.nextInt();
 
@@ -46,6 +47,10 @@ public class BuildTable {
         createTables();
         System.out.println("Created");
       }
+      else if (input == 2) {
+        fillTables();
+        System.out.println("Filled");
+      }
       else {
         System.out.println("Invalid Input");
       }
@@ -54,6 +59,7 @@ public class BuildTable {
       System.out.println("Enter -1 to quit");
       input = scanner.nextInt();
     }
+    scanner.close();
   }
 
 
@@ -186,6 +192,20 @@ public class BuildTable {
     stmt.executeUpdate(dropTable);
 
     stmt.close();
+  }
+
+  //Fills tables with junk. Must be in order.
+  public static void fillTables() {
+    Random rand = new Random();
+
+    String insertData = new String("INSERT INTO CARTEL" +
+            "(Cartel_ID, Message_Board, Num_Of_Members) VALUES ('" +
+            rand.nextInt(1000) + "','" + "','"
+            + rand.nextInt(50) + "')");
+  }
+
+  public static char charJunk() {
+
   }
 
   //Necessary in order for accessing the Database
