@@ -27,6 +27,7 @@ public class BuildTable {
   DatabaseMetaData meta = m_dbConn.getMetaData();
 
   public static void main(String[] args) throws SQLException {
+    //Declare Variables
     Scanner scanner = new Scanner(System.in);
     int input = 0;
     activateJDBC();
@@ -35,6 +36,7 @@ public class BuildTable {
     System.out.println("Enter -1 to quit");
     input = scanner.nextInt();
 
+    //Allows for user to try multiple times, specifically if they entered the wrong input
     while(input >= 0) {
       if (input == 0) {
         dropTables();
@@ -54,6 +56,8 @@ public class BuildTable {
     }
   }
 
+
+  //Creates the tables for the entire database. Must be in order.
   public static void createTables() throws SQLException {
     Statement stmt = m_dbConn.createStatement();
 
@@ -141,6 +145,7 @@ public class BuildTable {
     stmt.close();
   }
 
+  //Drops the tables for the entire database. Must be in order.
   public static void dropTables() throws SQLException {
     Statement stmt = m_dbConn.createStatement();
 
@@ -183,6 +188,7 @@ public class BuildTable {
     stmt.close();
   }
 
+  //Necessary in order for accessing the Database
   public static boolean activateJDBC() {
     try {
       Driver myDriver = new com.mysql.cj.jdbc.Driver();
