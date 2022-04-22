@@ -1,4 +1,5 @@
 import java.sql.*;
+import java.util.Scanner;
 
 public class BuildTable {
   public BuildTable() throws SQLException {
@@ -26,7 +27,34 @@ public class BuildTable {
   DatabaseMetaData meta = m_dbConn.getMetaData();
 
   public static void main(String[] args) throws SQLException {
+    Scanner scanner = new Scanner(System.in);
+    int input = 0;
     activateJDBC();
+
+    System.out.println("Would you like to create the tables (1) or drop the tables (0)?");
+    System.out.println("Enter -1 to quit");
+    input = scanner.nextInt();
+
+    while(input >= 0) {
+      if (input == 0) {
+        dropTables();
+        System.out.println("Dropped");
+      }
+      else if (input == 1) {
+        createTables();
+        System.out.println("Created");
+      }
+      else {
+        System.out.println("Invalid Input");
+      }
+
+      System.out.println("Would you like to create the tables (1) or drop the tables (0)?");
+      System.out.println("Enter -1 to quit");
+      input = scanner.nextInt();
+    }
+  }
+
+  public static void createTables() throws SQLException {
     Statement stmt = m_dbConn.createStatement();
 
     String createTable = new String("CREATE TABLE CARTEL" +
@@ -34,12 +62,10 @@ public class BuildTable {
             "Num_Of_Members int NOT NULL, PRIMARY KEY(Cartel_ID))");
     stmt.executeUpdate(createTable);
 
-    System.out.println("CARTEL");
     createTable = new String("CREATE TABLE ADMINISTRATOR" +
             "(Admin_ID int NOT NULL, PRIMARY KEY(Admin_ID))");
     stmt.executeUpdate(createTable);
 
-    System.out.println("ADMIN");
     createTable = new String("CREATE TABLE PLAYER" +
             "(Player_Name varchar(15) NOT NULL, Money Decimal(10, 2) NOT NULL, " +
             "Resources int NOT NULL, PlCartel_ID int NOT NULL, PlOrders varchar(25), " +
@@ -47,7 +73,6 @@ public class BuildTable {
             "FOREIGN KEY(PlCartel_ID) REFERENCES CARTEL(Cartel_ID))");
     stmt.executeUpdate(createTable);
 
-    System.out.println("PLAYER");
     createTable = new String("CREATE TABLE OVERSEEN_BY" +
             "(A_ID int NOT NULL, Play_ID varchar(15) NOT NULL, " +
             "Game varchar(15) NOT NULL, PRIMARY KEY(A_ID, Play_ID), " +
@@ -55,23 +80,17 @@ public class BuildTable {
             "FOREIGN KEY(Play_ID) REFERENCES PLAYER(Player_Name))");
     stmt.executeUpdate(createTable);
 
-    System.out.println("OVERSEEN");
-
     createTable = new String("CREATE TABLE FLEET_ORDERS" +
             "(FleetOrder_ID int NOT NULL, Orders varchar(25), " +
             "PRIMARY KEY(FleetOrder_ID), " +
             "FOREIGN KEY(Orders) REFERENCES PLAYER(PlOrders))");
     stmt.executeUpdate(createTable);
 
-    System.out.println("ORDERS");
-
     createTable = new String("CREATE TABLE FLEET" +
             "(Fleet_ID int NOT NULL, Order_Num int, " +
             "PRIMARY KEY(Fleet_ID), " +
             "FOREIGN KEY(Order_Num) REFERENCES FLEET_ORDERS(FleetOrder_ID))");
     stmt.executeUpdate(createTable);
-
-    System.out.println("FLEET");
 
     createTable = new String("CREATE TABLE SHIP" +
             "(ShipOwner_ID varchar(15) NOT NULL, Resources int NOT NULL, " +
@@ -84,16 +103,12 @@ public class BuildTable {
             "FOREIGN KEY(Fl_ID) REFERENCES FLEET(Fleet_ID))");
     stmt.executeUpdate(createTable);
 
-    System.out.println("SHIP");
-
     createTable = new String("CREATE TABLE PLANET" +
             "(Planet_ID int NOT NULL, Star_System int NOT NULL, " +
             "Resources int NOT NULL, PlanetOwner_ID varchar(15) NOT NULL, " +
             "Num_Of_Buildings int NOT NULL, PRIMARY KEY(Planet_ID, Star_System), " +
             "FOREIGN KEY(PlanetOwner_ID) REFERENCES PLAYER(Player_Name))");
     stmt.executeUpdate(createTable);
-
-    System.out.println("PLANET");
 
     createTable = new String("CREATE TABLE FACTORY" +
             "(FaPlanet_ID int NOT NULL, Factory_ID int NOT NULL, " +
@@ -102,16 +117,12 @@ public class BuildTable {
             "FOREIGN KEY(FaPlanet_ID) REFERENCES PLANET(Planet_ID))");
     stmt.executeUpdate(createTable);
 
-    System.out.println("FACTORY");
-
     createTable = new String("CREATE TABLE RESEARCH_CENTER" +
             "(RePlanet_ID int NOT NULL, Research_ID int NOT NULL, " +
             "Research_Type varchar(10), Resources int NOT NULL, " +
             "PRIMARY KEY(Research_ID, RePlanet_ID), " +
             "FOREIGN KEY(RePlanet_ID) REFERENCES PLANET(Planet_ID))");
     stmt.executeUpdate(createTable);
-
-    System.out.println("RESEARCH");
 
     createTable = new String("CREATE TABLE SHIPYARD" +
             "(ShPlanet_ID int NOT NULL, Shipyard_ID int NOT NULL, " +
@@ -120,15 +131,54 @@ public class BuildTable {
             "FOREIGN KEY(ShPlanet_ID) REFERENCES PLANET(Planet_ID))");
     stmt.executeUpdate(createTable);
 
-    System.out.println("SHIPYARD");
-
     createTable = new String("CREATE TABLE MINE" +
             "(MiPlanet_ID int NOT NULL, Mine_ID int NOT NULL, " +
             "Resources int NOT NULL, " +
             "PRIMARY KEY(Mine_ID, MiPlanet_ID), " +
             "FOREIGN KEY(MiPlanet_ID) REFERENCES PLANET(Planet_ID))");
     stmt.executeUpdate(createTable);
-    System.out.println("MINE");
+
+    stmt.close();
+  }
+
+  public static void dropTables() throws SQLException {
+    Statement stmt = m_dbConn.createStatement();
+
+    String dropTable = new String("DROP TABLE MINE");
+    stmt.executeUpdate(dropTable);
+
+    dropTable = new String("DROP TABLE SHIPYARD");
+    stmt.executeUpdate(dropTable);
+
+    dropTable = new String("DROP TABLE RESEARCH_CENTER");
+    stmt.executeUpdate(dropTable);
+
+    dropTable = new String("DROP TABLE FACTORY");
+    stmt.executeUpdate(dropTable);
+
+    dropTable = new String("DROP TABLE PLANET");
+    stmt.executeUpdate(dropTable);
+
+    dropTable = new String("DROP TABLE SHIP");
+    stmt.executeUpdate(dropTable);
+
+    dropTable = new String("DROP TABLE FLEET");
+    stmt.executeUpdate(dropTable);
+
+    dropTable = new String("DROP TABLE FLEET_ORDERS");
+    stmt.executeUpdate(dropTable);
+
+    dropTable = new String("DROP TABLE OVERSEEN_BY");
+    stmt.executeUpdate(dropTable);
+
+    dropTable = new String("DROP TABLE PLAYER");
+    stmt.executeUpdate(dropTable);
+
+    dropTable = new String("DROP TABLE ADMINISTRATOR");
+    stmt.executeUpdate(dropTable);
+
+    dropTable = new String("DROP TABLE CARTEL");
+    stmt.executeUpdate(dropTable);
 
     stmt.close();
   }
