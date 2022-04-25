@@ -1,4 +1,5 @@
 import java.sql.*;
+import java.text.DecimalFormat;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -55,7 +56,7 @@ public class BuildTable {
         System.out.println("Invalid Input");
       }
 
-      System.out.println("Would you like to create the tables (1) or drop the tables (0)?");
+      System.out.println("Would you like to Drop the tables (0), Create the tables (1), or Fill Tables (2)?");
       System.out.println("Enter -1 to quit");
       input = scanner.nextInt();
     }
@@ -195,17 +196,120 @@ public class BuildTable {
   }
 
   //Fills tables with junk. Must be in order.
-  public static void fillTables() {
+  public static void fillTables() throws SQLException {
     Random rand = new Random();
+    Statement stmt = m_dbConn.createStatement();
 
-    String insertData = new String("INSERT INTO CARTEL" +
-            "(Cartel_ID, Message_Board, Num_Of_Members) VALUES ('" +
-            rand.nextInt(1000) + "','" + "','"
-            + rand.nextInt(50) + "')");
+    for(int i = 1; i <= 5; i++) {
+      int Cartel_ID = rand.nextInt(10000);
+      int Admin_ID = rand.nextInt(10000);
+      String Player_Name = randString();
+      String orders = randString();
+      int FleetOrder_ID = rand.nextInt(10000);
+      int Fleet_ID = rand.nextInt(10000);
+      int Planet_ID = rand.nextInt(10000);
+
+      double money = rand.nextDouble();
+      DecimalFormat df = new DecimalFormat("#.00");
+
+      String insertData = new String("INSERT INTO CARTEL" +
+              "(Cartel_ID, Message_Board, Num_Of_Members) VALUES ('" +
+              Cartel_ID + "','" + randString() + "','"
+              + rand.nextInt(50) + "')");
+      stmt.executeUpdate(insertData);
+
+      System.out.println("CARTEL");
+
+      insertData = new String("INSERT INTO ADMINISTRATOR" +
+              "(Admin_ID) VALUES ('" + Admin_ID + "')");
+      stmt.executeUpdate(insertData);
+
+      System.out.println("ADMIN");
+
+      insertData = new String("INSERT INTO PLAYER" +
+              "(Player_Name, Money, Resources, PlCartel_ID, PlOrders) VALUES ('" +
+              Player_Name + "','" + df.format(money) + "','" + rand.nextInt(10000) +
+              "','" + Cartel_ID + "','" + orders + "')");
+      stmt.executeUpdate(insertData);
+
+      System.out.println("PLAYER");
+
+      insertData = new String("INSERT INTO OVERSEEN_BY" +
+              "(A_ID, Play_ID, Game) VALUES ('" + Admin_ID + "','"
+              + Player_Name + "','" + randString() + "')");
+      stmt.executeUpdate(insertData);
+
+      System.out.println("OVERSEEN");
+
+      insertData = new String("INSERT INTO FLEET_ORDERS" +
+              "(FleetOrder_ID, Orders) VALUES ('" +
+              FleetOrder_ID + "','" + orders + "')");
+      stmt.executeUpdate(insertData);
+
+      System.out.println("ORDERS");
+
+      insertData = new String("INSERT INTO FLEET" +
+              "(Fleet_ID, Order_Num) VALUES ('" + Fleet_ID
+              + "','" + FleetOrder_ID + "')");
+      stmt.executeUpdate(insertData);
+
+      System.out.println("FLEET");
+
+      insertData = new String("INSERT INTO SHIP" +
+              "(ShipOwner_ID, Resources, Ship_ID, Location, Type, " +
+              "Speed, Cargo_Tech, Hull_Tech, Weapons_Tech, " +
+              "Engine_Tech, Fl_ID) VALUES ('" + Player_Name + "','" +
+              rand.nextInt(100) + "','" + rand.nextInt(10000) + "','" + randString()
+              + "','" + randString() + "','" + rand.nextInt() + "','" +
+              rand.nextInt() + "','" + rand.nextInt() + "','" +
+              rand.nextInt() + "','" + rand.nextInt() + "','" + Fleet_ID + "')");
+      stmt.executeUpdate(insertData);
+
+      insertData = new String("INSERT INTO PLANET" +
+              "(Planet_ID, Star_System, Resources, PlanetOwner_ID, Num_Of_Buildings" +
+              ") VALUES ('" + Planet_ID + "','" + rand.nextInt(10) + "','" + rand.nextInt(100)
+              + "','" + Player_Name + "','" + rand.nextInt(100) + "')");
+      stmt.executeUpdate(insertData);
+
+      insertData = new String("INSERT INTO FACTORY" +
+              "(FaPlanet_ID, Factory_ID, Baubles, Resources) VALUES ('" +
+              Planet_ID + "','" + rand.nextInt(100) + "','" + rand.nextInt(1000)
+              + "','" + rand.nextInt(100) + "')");
+      stmt.executeUpdate(insertData);
+
+      insertData = new String("INSERT INTO RESEARCH_CENTER" +
+              "(RePlanet_ID, Research_ID, Research_Type, Resources) VALUES ('" +
+              Planet_ID + "','" + rand.nextInt(100) + "','" + randString()
+              + "','" + rand.nextInt(1000) + "')");
+      stmt.executeUpdate(insertData);
+
+      insertData = new String("INSERT INTO SHIPYARD" +
+              "(ShPlanet_ID, Shipyard_ID, Ships, Resources) VALUES ('" +
+              Planet_ID + "','" + rand.nextInt(100) + "','" + rand.nextInt(100)
+              + "','" + rand.nextInt(100) + "')");
+      stmt.executeUpdate(insertData);
+
+      insertData = new String("INSERT INTO MINE" +
+              "(MiPlanet_ID, Mine_ID, Resources) VALUES ('" +
+              Planet_ID + "','" + rand.nextInt(100) + "','" + rand.nextInt(100) + "')");
+      stmt.executeUpdate(insertData);
+    }
+
+    stmt.close();
   }
 
-  public static char charJunk() {
+  //Produces a random String intended to fill the database.
+  public static String randString() {
+    String stringJunk = "";
+    String[] alphabet = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l",
+            "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "x", "y", "z"};
+    Random rand = new Random();
 
+    for (int x = 0; x < 9; x++) {
+      stringJunk = stringJunk + alphabet[rand.nextInt(alphabet.length)];
+    }
+
+    return stringJunk;
   }
 
   //Necessary in order for accessing the Database
