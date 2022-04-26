@@ -34,7 +34,8 @@ public class BuildTable {
     int input = 0;
     activateJDBC();
 
-    System.out.println("Would you like to Drop the tables (0), Create the tables (1), or Fill Tables (2)?");
+    System.out.println("Would you like to Drop the tables (0), " +
+                      "Create the tables (1), or Fill Tables (2)?");
     System.out.println("Enter -1 to quit");
     input = scanner.nextInt();
 
@@ -56,7 +57,8 @@ public class BuildTable {
         System.out.println("Invalid Input");
       }
 
-      System.out.println("Would you like to Drop the tables (0), Create the tables (1), or Fill Tables (2)?");
+      System.out.println("Would you like to Drop the tables (0), " +
+              "Create the tables (1), or Fill Tables (2)?");
       System.out.println("Enter -1 to quit");
       input = scanner.nextInt();
     }
@@ -228,8 +230,8 @@ public class BuildTable {
 
       insertData = new String("INSERT INTO PLAYER" +
               "(Player_Name, Money, Resources, PlCartel_ID, PlOrders) VALUES ('" +
-              Player_Name + "','" + df.format(money) + "','" + rand.nextInt(10000) +
-              "','" + Cartel_ID + "','" + orders + "')");
+              Player_Name + "','" + df.format(money) + "','" +
+              rand.nextInt(10000) + "','" + Cartel_ID + "','" + orders + "')");
       stmt.executeUpdate(insertData);
 
       System.out.println("PLAYER");
@@ -259,22 +261,23 @@ public class BuildTable {
               "(ShipOwner_ID, Resources, Ship_ID, Location, Type, " +
               "Speed, Cargo_Tech, Hull_Tech, Weapons_Tech, " +
               "Engine_Tech, Fl_ID) VALUES ('" + Player_Name + "','" +
-              rand.nextInt(100) + "','" + rand.nextInt(10000) + "','" + randString()
-              + "','" + randString() + "','" + rand.nextInt() + "','" +
+              rand.nextInt(100) + "','" + rand.nextInt(10000) + "','" +
+              randString() + "','" + randString() + "','" + rand.nextInt() + "','" +
               rand.nextInt() + "','" + rand.nextInt() + "','" +
               rand.nextInt() + "','" + rand.nextInt() + "','" + Fleet_ID + "')");
       stmt.executeUpdate(insertData);
 
       insertData = new String("INSERT INTO PLANET" +
               "(Planet_ID, Star_System, Resources, PlanetOwner_ID, Num_Of_Buildings" +
-              ") VALUES ('" + Planet_ID + "','" + rand.nextInt(10) + "','" + rand.nextInt(100)
-              + "','" + Player_Name + "','" + rand.nextInt(100) + "')");
+              ") VALUES ('" + Planet_ID + "','" + rand.nextInt(10) + "','"
+              + rand.nextInt(100) + "','" + Player_Name + "','" +
+              rand.nextInt(100) + "')");
       stmt.executeUpdate(insertData);
 
       insertData = new String("INSERT INTO FACTORY" +
               "(FaPlanet_ID, Factory_ID, Baubles, Resources) VALUES ('" +
-              Planet_ID + "','" + rand.nextInt(100) + "','" + rand.nextInt(1000)
-              + "','" + rand.nextInt(100) + "')");
+              Planet_ID + "','" + rand.nextInt(100) + "','" +
+              rand.nextInt(1000) + "','" + rand.nextInt(100) + "')");
       stmt.executeUpdate(insertData);
 
       insertData = new String("INSERT INTO RESEARCH_CENTER" +
@@ -285,13 +288,14 @@ public class BuildTable {
 
       insertData = new String("INSERT INTO SHIPYARD" +
               "(ShPlanet_ID, Shipyard_ID, Ships, Resources) VALUES ('" +
-              Planet_ID + "','" + rand.nextInt(100) + "','" + rand.nextInt(100)
-              + "','" + rand.nextInt(100) + "')");
+              Planet_ID + "','" + rand.nextInt(100) + "','" +
+              rand.nextInt(100) + "','" + rand.nextInt(100) + "')");
       stmt.executeUpdate(insertData);
 
       insertData = new String("INSERT INTO MINE" +
               "(MiPlanet_ID, Mine_ID, Resources) VALUES ('" +
-              Planet_ID + "','" + rand.nextInt(100) + "','" + rand.nextInt(100) + "')");
+              Planet_ID + "','" + rand.nextInt(100) + "','"
+              + rand.nextInt(100) + "')");
       stmt.executeUpdate(insertData);
     }
 
