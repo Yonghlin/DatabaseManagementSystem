@@ -78,17 +78,20 @@ public class displayFour implements ActionListener {
 					
 					JButton showPlayerButton = new JButton("Show Selected Player");
 					showPlayerButton.addActionListener(new ActionListener() {
-						@SuppressWarnings("unused")
-						public void actionPerformed(Action e) {
-							if (playerList.getSelectedIndex() != -1) {
-								
-							}
-						}
-
-						@Override
 						public void actionPerformed(ActionEvent e) {
-							// TODO Auto-generated method stub
-							
+							if (playerList.getSelectedIndex() != -1) {
+								DefaultListModel<String> selectedPlayerName = new DefaultListModel<String>();
+								selectedPlayerName.addElement(playerList.getSelectedValue());
+								
+								JList<String> selectedPlayerList = new JList<String>(selectedPlayerName);
+								playerList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+								playerList.setSelectedIndex(1);
+								playerList.setVisibleRowCount(6);
+								playerList.setPreferredSize(new Dimension(100, 200));
+								
+								JScrollPane ListSelectedPlayerScrollPane = new JScrollPane(selectedPlayerList);
+								controlPanel.add(ListSelectedPlayerScrollPane);
+							}
 						}
 					});
 					controlPanel.add(showPlayerButton);
@@ -144,3 +147,4 @@ public class displayFour implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
 	}
+}
