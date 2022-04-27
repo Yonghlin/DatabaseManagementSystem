@@ -43,11 +43,14 @@ public class PlanetDisplay implements ActionListener {
   }
 
   private void runDemo() {
-    headerLabel.setText("Control in action: JList");
+    headerLabel.setText("Planet List");
     final DefaultListModel<String> planetName = new DefaultListModel<String>();
 
     planetName.addElement("Planet 1");
     planetName.addElement("Planet 2");
+    
+    String select = "SELECT * IN PLANET";
+    
 
     final JList<String> planetList = new JList<String>(planetName);
     planetList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -57,16 +60,25 @@ public class PlanetDisplay implements ActionListener {
 
     JScrollPane ListScrollPane = new JScrollPane(planetList);
 
-    JButton showButton = new JButton("Show");
+/*
+ * EDIT BUTTON********************************************************************
+ */    
+    
+    JButton editButton = new JButton("Edit");
 
-    showButton.addActionListener(new ActionListener() {
+    editButton.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         String data = "";
         if (planetList.getSelectedIndex() != -1) {
           data = "Planet Selected: " + planetList.getSelectedValue();
           statusLabel.setText(data);
+          
+          JFrame sideFrame = new JFrame(planetList.getSelectedValue());
+          sideFrame.setSize(400, 400);
+          sideFrame.setLayout(new GridLayout(3, 1));
+          
+          sideFrame.setVisible(true);
         }
-        statusLabel.setText(data);
       }
     });
 /*
@@ -77,7 +89,6 @@ public class PlanetDisplay implements ActionListener {
     addButton.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         String title = JOptionPane.showInputDialog(null, "Enter planet name:");
-        System.out.println("Title is:" + title);
         planetName.addElement(title);
       }
     });
@@ -102,7 +113,7 @@ public class PlanetDisplay implements ActionListener {
     });
     
     controlPanel.add(ListScrollPane);
-    controlPanel.add(showButton);
+    controlPanel.add(editButton);
     controlPanel.add(addButton);
     controlPanel.add(deleteButton);
 
