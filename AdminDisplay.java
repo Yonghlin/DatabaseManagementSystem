@@ -96,7 +96,7 @@ public class AdminDisplay implements ActionListener {
         String data = "";
         if (playerList.getSelectedIndex() != -1) {
           int index = playerList.getSelectedIndex();
-          data = "Planet Deleted: " + playerList.getSelectedValue();
+          data = "Player Deleted: " + playerList.getSelectedValue();
           playerName.removeElementAt(index);
           statusLabel.setText(data);
         }
