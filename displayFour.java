@@ -78,17 +78,36 @@ public class displayFour implements ActionListener {
 					
 					JButton showPlayerButton = new JButton("Show Selected Player");
 					showPlayerButton.addActionListener(new ActionListener() {
-						@SuppressWarnings("unused")
-						public void actionPerformed(Action e) {
-							if (playerList.getSelectedIndex() != -1) {
-								
-							}
-						}
-
-						@Override
 						public void actionPerformed(ActionEvent e) {
-							// TODO Auto-generated method stub
-							
+							if (playerList.getSelectedIndex() != -1) {
+								DefaultListModel<String> selectedPlayerName = new DefaultListModel<String>();
+								selectedPlayerName.addElement(playerList.getSelectedValue());
+								
+								JList<String> selectedPlayerList = new JList<String>(selectedPlayerName);
+								playerList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+								playerList.setSelectedIndex(1);
+								playerList.setVisibleRowCount(6);
+								playerList.setPreferredSize(new Dimension(100, 200));
+								
+								JScrollPane ListSelectedPlayerScrollPane = new JScrollPane(selectedPlayerList);
+								controlPanel.add(ListSelectedPlayerScrollPane);
+								
+								JButton deletePlayerButton = new JButton("Delete Player");
+								deletePlayerButton.addActionListener(new ActionListener() {
+									public void actionPerformed(ActionEvent e) {
+										String data = "";
+										if (playerList.getSelectedIndex() != -1) {
+											int index = playerList.getSelectedIndex();
+											data = "Player deleted: " + playerList.getSelectedValue();
+											playerName.removeElementAt(index);
+											selectedPlayerName.removeElementAt(index);
+											statusLabel.setText(data);
+										}
+										statusLabel.setText(data);
+									}
+								});
+								controlPanel.add(deletePlayerButton);
+							}
 						}
 					});
 					controlPanel.add(showPlayerButton);
@@ -144,3 +163,4 @@ public class displayFour implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
 	}
+}
