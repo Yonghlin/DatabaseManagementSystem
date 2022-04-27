@@ -91,6 +91,22 @@ public class displayFour implements ActionListener {
 								
 								JScrollPane ListSelectedPlayerScrollPane = new JScrollPane(selectedPlayerList);
 								controlPanel.add(ListSelectedPlayerScrollPane);
+								
+								JButton deletePlayerButton = new JButton("Delete Player");
+								deletePlayerButton.addActionListener(new ActionListener() {
+									public void actionPerformed(ActionEvent e) {
+										String data = "";
+										if (playerList.getSelectedIndex() != -1) {
+											int index = playerList.getSelectedIndex();
+											data = "Player deleted: " + playerList.getSelectedValue();
+											playerName.removeElementAt(index);
+											selectedPlayerName.removeElementAt(index);
+											statusLabel.setText(data);
+										}
+										statusLabel.setText(data);
+									}
+								});
+								controlPanel.add(deletePlayerButton);
 							}
 						}
 					});
