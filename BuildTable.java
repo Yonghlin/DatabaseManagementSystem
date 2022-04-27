@@ -35,7 +35,7 @@ public class BuildTable {
     activateJDBC();
 
     System.out.println("Would you like to Drop the tables (0), " +
-                      "Create the tables (1), or Fill Tables (2)?");
+            "Create the tables (1), or Fill Tables (2)?");
     System.out.println("Enter -1 to quit");
     input = scanner.nextInt();
 
@@ -100,9 +100,10 @@ public class BuildTable {
     stmt.executeUpdate(createTable);
 
     createTable = new String("CREATE TABLE FLEET" +
-            "(Fleet_ID int NOT NULL, Order_Num int, " +
-            "PRIMARY KEY(Fleet_ID), " +
-            "FOREIGN KEY(Order_Num) REFERENCES FLEET_ORDERS(FleetOrder_ID))");
+            "(Fleet_ID int NOT NULL, Order_Num int, FleetOwner_ID " +
+            "varchar(15) NOT NULL, PRIMARY KEY(Fleet_ID), " +
+            "FOREIGN KEY(Order_Num) REFERENCES FLEET_ORDERS(FleetOrder_ID), " +
+            "FOREIGN KEY(FleetOwner_ID) REFERENCES PLAYER(Player_Name))");
     stmt.executeUpdate(createTable);
 
     createTable = new String("CREATE TABLE SHIP" +
@@ -220,13 +221,9 @@ public class BuildTable {
               + rand.nextInt(50) + "')");
       stmt.executeUpdate(insertData);
 
-      System.out.println("CARTEL");
-
       insertData = new String("INSERT INTO ADMINISTRATOR" +
               "(Admin_ID) VALUES ('" + Admin_ID + "')");
       stmt.executeUpdate(insertData);
-
-      System.out.println("ADMIN");
 
       insertData = new String("INSERT INTO PLAYER" +
               "(Player_Name, Money, Resources, PlCartel_ID, PlOrders) VALUES ('" +
@@ -234,28 +231,20 @@ public class BuildTable {
               rand.nextInt(10000) + "','" + Cartel_ID + "','" + orders + "')");
       stmt.executeUpdate(insertData);
 
-      System.out.println("PLAYER");
-
       insertData = new String("INSERT INTO OVERSEEN_BY" +
               "(A_ID, Play_ID, Game) VALUES ('" + Admin_ID + "','"
               + Player_Name + "','" + randString() + "')");
       stmt.executeUpdate(insertData);
-
-      System.out.println("OVERSEEN");
 
       insertData = new String("INSERT INTO FLEET_ORDERS" +
               "(FleetOrder_ID, Orders) VALUES ('" +
               FleetOrder_ID + "','" + orders + "')");
       stmt.executeUpdate(insertData);
 
-      System.out.println("ORDERS");
-
       insertData = new String("INSERT INTO FLEET" +
-              "(Fleet_ID, Order_Num) VALUES ('" + Fleet_ID
-              + "','" + FleetOrder_ID + "')");
+              "(Fleet_ID, Order_Num, FleetOwner_ID) VALUES ('" + Fleet_ID
+              + "','" + FleetOrder_ID + "','" + Player_Name + "')");
       stmt.executeUpdate(insertData);
-
-      System.out.println("FLEET");
 
       insertData = new String("INSERT INTO SHIP" +
               "(ShipOwner_ID, Resources, Ship_ID, Location, Type, " +
