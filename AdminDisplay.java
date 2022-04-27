@@ -80,7 +80,7 @@ public class AdminDisplay implements ActionListener {
 
     addButton.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        String title = JOptionPane.showInputDialog(null, "Enter planet name:");
+        String title = JOptionPane.showInputDialog(null, "Enter Player name:");
         System.out.println("Title is:" + title);
         playerName.addElement(title);
       }
