@@ -321,7 +321,7 @@ public class FleetDisplay implements ActionListener {
         fleetButtons.add(addFleet);
         fleetButtons.add(deleteFleet);
         controlPanel.add(fleetButtons);
-        
+
         shipsTable.add(shipListScrollPane);
         shipButtons.add(selectShip);
         shipButtons.add(addShip);
