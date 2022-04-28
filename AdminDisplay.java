@@ -7,6 +7,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.*;
 import java.sql.*;
+import java.text.DecimalFormat;
 
 
 public class AdminDisplay implements ActionListener {
@@ -14,17 +15,15 @@ public class AdminDisplay implements ActionListener {
   private JLabel headerLabel;
   private JLabel statusLabel;
   private JPanel controlPanel;
+  
 
-  /**
-   * 
-   * 
   public static final String DB_LOCATION = "jdbc:mysql://db.engr.ship.edu:3306/csc471_12?useTimezone=true&serverTimezone=UTC";
   public static final String LOGIN_NAME = "csc471_12";
   public static final String PASSWORD = "Password_12";
   protected static Connection m_dbConn = null;
 
-  /**
-   * Creates a connection to the database that you can then send commands to.
+  
+   // Creates a connection to the database that you can then send commands to.
    
   static {
       try {
@@ -34,15 +33,15 @@ public class AdminDisplay implements ActionListener {
       }
   }
 
-  /**
-   * To get the meta data for the DB.
+  
+  // To get the meta data for the DB.
    
   DatabaseMetaData meta = m_dbConn.getMetaData();
-  */
+  
   public AdminDisplay() throws SQLException{
     mainFrame = new JFrame("Admin Display");
     mainFrame.setSize(400, 400);
-    mainFrame.setLayout(new GridLayout(3,1));
+    mainFrame.setLayout(new GridLayout(4,1));
     
     mainFrame.addWindowListener(new WindowAdapter() {
       public void windowClosing(WindowEvent windowEvent) {
@@ -68,22 +67,19 @@ public class AdminDisplay implements ActionListener {
     database.runDemo();
   }
 
-  private void runDemo() {
-    //Statement stmt = m_dbConn.createStatement();
+  private void runDemo() throws SQLException {
+    Statement stmt = m_dbConn.createStatement();
       
-    headerLabel.setText("Control in action: JList");
+    headerLabel.setText(" ");
     final DefaultListModel<String> playerName = new DefaultListModel<String>();
 
-    /* Gets all the player names from DB and adds them to playerName list
+    //Gets all the player names from DB and adds them to playerName list
     String names = new String("SELECT PLAYER_NAME FROM PLAYER");
-    //stmt.execute(names);
-    //ResultSet set = stmt.getResultSet();
-    //while(set.next()) {
-	//fleetID.addElement(set.getString("Player_Name"));
-    }*/
-
-    playerName.addElement("John Deer");
-    playerName.addElement("Joe Well");
+    stmt.execute(names);
+    ResultSet set = stmt.getResultSet();
+    while(set.next()) {
+	playerName.addElement(set.getString("Player_Name"));
+    }
 
     final JList<String> playerList = new JList<String>(playerName);
     playerList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -101,23 +97,44 @@ public class AdminDisplay implements ActionListener {
         String data = "";
         
         if (playerList.getSelectedIndex() != -1) {
-          //Statement stmt = m_dbConn.createStatement();
-          String view = new String (playerList.getSelectedValue() + ", 100, 10000, 12343, Right");
-          //String view = new String ("SELECT Player_Name, Money, Resources, PlCartel_ID, PlOrders FROM PLAYER WHERE Player_Name = " + playerList.getSelectedValue());
-          //stmt.execute(view);
-          //ResultSet set = stmt.getResultSet();
-          data = "Player " + playerList.getSelectedValue() + " Attributes: " + view; //do i put view here or set
-          headerLabel.setText("Showing Player " + playerList.getSelectedValue() + " attributes");
-
+            
+           
+          try {
+              Statement stmt = m_dbConn.createStatement();
+              
+              String view = new String ("SELECT Player_Name, Money, Resources, PlCartel_ID, PlOrders FROM PLAYER WHERE Player_Name = " + "'"+playerList.getSelectedValue()+"'");
+              stmt.execute(view);
+              ResultSet set = stmt.getResultSet();
+              
+              String playerMoney = "";
+              String playerResources = "";
+              String playerPlCartel_ID = "";
+              String playerPlOrders = "";
+              while (set.next()) {
+        	  playerMoney = set.getString("Money");
+        	  playerResources = set.getString("Resources");
+        	  playerPlCartel_ID = set.getString("PlCartel_ID");
+        	  playerPlOrders = set.getString("PlOrders");
+        	  
+              }
+              
+              data = "Player " + playerList.getSelectedValue() + " Attributes: " + "Money: " + playerMoney + ", Resources: " + playerResources + 
+        	      ", PlCartel_ID: " + playerPlCartel_ID + ", PlOrders: " + playerPlOrders; 
+              headerLabel.setText("Showing Player " + playerList.getSelectedValue() + " attributes");
+          } catch (SQLException ex) {
+              ex.printStackTrace();
+          }
           statusLabel.setText(data);
+         
  
         } 
         
         statusLabel.setText(data);
+        
       }
     });
 /*
- * ADD BUTTON******************************************************************** 99,999,999.99
+ * ADD BUTTON******************************************************************** 
  */
     JButton addButton = new JButton("Add Player");
 
@@ -126,22 +143,27 @@ public class AdminDisplay implements ActionListener {
         String currentPlayerName = JOptionPane.showInputDialog(null, "Enter Player name (15 chars): ");
         String currentPlayerMoney = JOptionPane.showInputDialog(null, "Enter Player current Money (Max 99,999,999.99): ");
         String currentPlayerResources = JOptionPane.showInputDialog(null, "Enter Player current number of Resources: ");
-        String currentPlayerCratelID = JOptionPane.showInputDialog(null, "Enter Player CartelID number (4 digits): ");
+        String currentPlayerCartelID = JOptionPane.showInputDialog(null, "Enter Player CartelID number (4 digits): ");
         String currentPlayerOrders = JOptionPane.showInputDialog(null, "Enter Player Orders (25 chars): ");
 
         playerName.addElement(currentPlayerName);
-        headerLabel.setText("Player added: " + currentPlayerName);
+        headerLabel.setText("Player added: " + currentPlayerName + ",");
         
-        /*
-         Try {
+        
+         try {
+             	DecimalFormat df = new DecimalFormat("#.00");
           	Statement stmt = m_dbConn.createStatement();
-          	String add = "INSERT INTO PLAYER" + 
-         		"(PLAYER_NAME, Money, Resources, PlCartelID, PlOrders) VALUES ('" + currentPlayerName + "','" + 
-         		currentPlayerMoney + "','" + currentPlayerResources + "','" + currentPlayerCratelID + "','" + currentPlayerOrders + "')");	
+          	String add = new String ("INSERT INTO PLAYER" + 
+         		"(PLAYER_NAME, Money, Resources, PlCartel_ID, PlOrders) VALUES ('" + currentPlayerName + "','" +
+         		currentPlayerMoney  + "','" + currentPlayerResources + "','" + currentPlayerCartelID + "','" + currentPlayerOrders + "')");	
+          	
          
+          	stmt.execute(add);          	
+          	
+          	
          } catch (SQLException ex) {
              ex.printStackTrace();
-         }*/
+         }
         
       }
     });
@@ -157,19 +179,23 @@ public class AdminDisplay implements ActionListener {
         if (playerList.getSelectedIndex() != -1) {
           int index = playerList.getSelectedIndex();
           data = "Player Deleted: " + playerList.getSelectedValue();
-          headerLabel.setText("Player " + playerList.getSelectedValue() + " deleted");
-          playerName.removeElementAt(index);
-          
+          headerLabel.setText(data);
           statusLabel.setText(data);
           
-          /*try {
-          //    Statement stmt = m_dbConn.createStatement();
-              	String delete = "DELETE FROM PLAYER WHERE Player_Name = " + playerList.getSelectedIndex();
-              	stmt.execute(delete);
+          try {
+              	//Creates Stored Procedure for deleting the player from the database
+              	String sql = "CALL delete_Player(?)";
+              	CallableStatement stmt = m_dbConn.prepareCall(sql);
+              	stmt.setString(1, playerList.getSelectedValue());
+
+        
+              	stmt.executeUpdate();
+              	playerName.removeElementAt(index);
+              	
               	stmt.close();	             
           } catch (SQLException ex) {
            	ex.printStackTrace();
-          }*/
+          }
         }
 
         statusLabel.setText(data);
@@ -187,15 +213,8 @@ public class AdminDisplay implements ActionListener {
  * EDIT BUTTON
  */   
     
-    String[] attributes = {"Player_Name", "Money", "Resources", "Player_Cartel_ID", "Player_Orders"}; //will be SQL to see current players attributes
+    String[] attributes = {"Player_Name", "Money", "Resources", "PlCartel_ID", "PlOrders"}; //will be SQL to see current players attributes
     JComboBox editButton = new JComboBox(attributes);
-    /* Gets all the player names from DB and adds them to playerName list
-    String names = new String("SELECT PLAYER_NAME FROM PLAYER");
-    //stmt.execute(names);
-    //ResultSet set = stmt.getResultSet();
-    //while(set.next()) {
-	//playerList.addElement(set.getString("Player_Name"));
-    }*/
     
     
     JButton editPlayer = new JButton("Edit Player ");
@@ -218,13 +237,21 @@ public class AdminDisplay implements ActionListener {
 		                    String title = JOptionPane.showInputDialog(null, "Enter new value for "+editButton.getSelectedItem().toString() +": ");
 		                    
 		                    // SQL statement to change value to new value
-		                    /*
-		                     * try {
-		                     * 	   Statement stmt = m_dbConn.createStatement();
-		                     * 	   
-		                     *     String updateValue = "UPDATE PLAYER SET " + editButton.getSelectedValue() + "'='" + title + "WHERE " 
-		                     * 
-		                     */
+		                    try {
+			                      Statement stmt = m_dbConn.createStatement();
+			                      	   
+			                      String updateValue = "UPDATE PLAYER SET "+ editButton.getSelectedItem().toString() + "=" +"'"+ title +"'"+ "WHERE Player_Name ="+ "'"+ playerList.getSelectedValue()+"'";
+			                      stmt.execute(updateValue);
+			                      stmt.close();
+			                     
+			                      
+			                      
+			                      statusLabel.setText(data);
+			          	 } catch (SQLException ex) {
+			          	      ex.printStackTrace();
+			          	 }
+		                      
+		                     
 		                     data = ("New "+ editButton.getSelectedItem().toString() +" value is " + title + " for player " + playerName);
 		                     statusLabel.setText(data);
 		          	  }
@@ -232,7 +259,7 @@ public class AdminDisplay implements ActionListener {
 		        }
 		    });
 		  controlPanel.add(editButton);
-	          statusLabel.setText(data);
+	          
 
 	    }
 	    
