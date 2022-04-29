@@ -8,6 +8,25 @@ import java.awt.event.WindowEvent;
 import java.sql.*;
 import javax.swing.*;
 
+/**
+ * Brennan Mulligan
+ * Group 4
+ * 4/28/2022, Database Management Systems
+ * Dr. Girard
+ * BCM, My work is my own
+ *
+ * FleetDisplay acts as an interface to help interact with the
+ * Fleet, Fleet_Orders, and Ship Tables of the CSC471_12 Database
+ * of Shippensburg University.
+ *
+ * The user is able to see lists of all of the fleets that they own,
+ * add/remove fleets, see all the ships that are in each fleet, and
+ * add/remove/move ships. Information about ships is provided.
+ *
+ * **YOU MUST** make sure the tables have already been created using
+ * BuildTable.java. Feel free to fill them with dummy data.
+ */
+
 public class FleetDisplay implements ActionListener {
     private JFrame mainFrame;
     private JPanel fleetsTable;
