@@ -43,6 +43,7 @@ public class FleetDisplay implements ActionListener {
     DatabaseMetaData meta = m_dbConn.getMetaData();
 
     public FleetDisplay() throws SQLException {
+        //Main Display Object
         mainFrame = new JFrame("Fleets");
         mainFrame.setSize(800, 400);
         mainFrame.setLayout(new GridLayout(3, 1));
@@ -53,6 +54,7 @@ public class FleetDisplay implements ActionListener {
             }
         });
 
+        //All of the Labels and Text
         fleetsLabel = new JLabel("Fleets", JLabel.CENTER);
         shipsLabel = new JLabel("Ships", JLabel.CENTER);
         fleetStatusLabel = new JLabel("", JLabel.CENTER);
@@ -62,24 +64,27 @@ public class FleetDisplay implements ActionListener {
         detailsLabel = new JLabel("", JLabel.CENTER);
         detailsLabel.setSize(100, 150);
 
+        //Minor Panel for Lists and Buttons
         controlPanel = new JPanel();
         controlPanel.setLayout(new FlowLayout());
 
+        //Button Panels That Stack the Buttons on top of each other
         fleetButtons = new JPanel();
         fleetButtons.setLayout(new BoxLayout(fleetButtons, BoxLayout.PAGE_AXIS));
         shipButtons = new JPanel();
         shipButtons.setLayout(new BoxLayout(shipButtons, BoxLayout.PAGE_AXIS));
 
+        //Lefthand Fleet Section that stacks the label and the list
         fleetsTable = new JPanel();
         fleetsTable.setLayout(new BoxLayout(fleetsTable, BoxLayout.PAGE_AXIS));
         fleetsTable.add(fleetsLabel);
 
+        //Righthand Fleet Section that stacks the label and the list
         shipsTable = new JPanel();
         shipsTable.setLayout(new BoxLayout(shipsTable, BoxLayout.PAGE_AXIS));
         shipsTable.add(shipsLabel);
 
         mainFrame.add(controlPanel);
-        //mainFrame.add(statusLabel);
         mainFrame.add(detailsLabel);
         mainFrame.setVisible(true);
     }
@@ -154,6 +159,7 @@ public class FleetDisplay implements ActionListener {
                 if (fleetList.getSelectedIndex() != -1) {
                     data = fleetList.getSelectedValue();
                     fleetStatusLabel.setText("Fleet Selected: " + data);
+                    shipStatusLabel.setText("");
                     detailsLabel.setText("");
                 }
 
@@ -181,16 +187,26 @@ public class FleetDisplay implements ActionListener {
 
         addFleet.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                //Adds to list and displays confirmation message
                 String newFleetID = JOptionPane.showInputDialog(null, "Enter Fleet ID:");
-                System.out.println("ID is:" + newFleetID);
                 fleetID.addElement(newFleetID);
                 fleetStatusLabel.setText("Fleet Added: " + newFleetID);
 
                 try {
+                    //Executes SQL Statement to Get OrderID for making a new Fleet
                     Statement stmt = m_dbConn.createStatement();
+                    String getOrderID = "SELECT FleetOrder_ID FROM FLEET_ORDERS";
+                    stmt.execute(getOrderID);
+                    ResultSet set = stmt.getResultSet();
+                    set.next();
+                    String orderID = set.getString(1);
+
+                    //Executes SQL Statement to Add to Database
                     String add = "INSERT INTO FLEET" +
                             "(Fleet_ID, Order_Num, FleetOwner_ID) VALUES ('"
-                            + newFleetID + "','" + 0 + "','" + newPlayerID +"')";
+                            + newFleetID + "','" + orderID + "','" + newPlayerID +"')";
+                    stmt.execute(add);
+                    stmt.close();
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                 }
@@ -204,24 +220,23 @@ public class FleetDisplay implements ActionListener {
 
         deleteFleet.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String data = "";
+                String currentFleetID = "";
                 if (fleetList.getSelectedIndex() != -1) {
                     int index = fleetList.getSelectedIndex();
-                    data = fleetList.getSelectedValue();
+                    currentFleetID = fleetList.getSelectedValue();
                     fleetID.removeElementAt(index);
-                    fleetStatusLabel.setText("Fleet Deleted: " + data);
+                    fleetStatusLabel.setText("Fleet Deleted: " + currentFleetID);
 
                     try {
                         Statement stmt = m_dbConn.createStatement();
 
-                        for(int i = 0; !shipID.isEmpty(); i++) {
-                            String delete = "DELETE FROM SHIP WHERE Ship_ID='" + shipID.getElementAt(i) + "'";
-                            shipID.removeElementAt(0);
-                            stmt.execute(delete);
-                        }
+                        //Removes and Deletes All Ships From Fleet Before Deleting the Fleet
+                        String delete = "DELETE FROM SHIP WHERE Fl_ID='" + currentFleetID + "'";
+                        stmt.execute(delete);
                         shipID.clear();
 
-                        String delete = "DELETE FROM FLEET WHERE Fleet_ID='" + data + "'";
+                        //Executes SQL Statement to Delete The Fleet
+                        delete = "DELETE FROM FLEET WHERE Fleet_ID='" + currentFleetID + "'";
                         stmt.execute(delete);
                         stmt.close();
                     } catch (SQLException ex) {
@@ -238,6 +253,7 @@ public class FleetDisplay implements ActionListener {
 
         selectShip.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                //Variables to help properly fill New Ship Entry
                 String selectedShipID = "";
                 String resources = "";
                 String location = "";
@@ -248,12 +264,13 @@ public class FleetDisplay implements ActionListener {
                 String weapons = "";
                 String engine = "";
 
-                //Makes sure that user has selected a Fleet
+                //Makes sure that user has selected a Ship
                 if (shipList.getSelectedIndex() != -1) {
                     selectedShipID = shipList.getSelectedValue();
                     shipStatusLabel.setText("Ship Selected: " + selectedShipID);
 
                     try {
+                        //Gets all of the Ship Info from Database and sets it to variables
                         String shipInfo = "SELECT * FROM SHIP WHERE Ship_ID='" + selectedShipID + "'";
                         Statement stmt = m_dbConn.createStatement();
                         stmt.execute(shipInfo);
@@ -272,7 +289,8 @@ public class FleetDisplay implements ActionListener {
                         ex.printStackTrace();
                     }
 
-                    detailsLabel.setText("Resources: " + resources + ", Location:" + location
+                    //Presents Information on the Ship to the User
+                    detailsLabel.setText("Resources: " + resources + ", Location: " + location
                             + ", Type: " + type + ",\n Speed: " + speed + ", Cargo: " + cargo +
                             ", Hull: " + hull + ",\n Weapons: " + weapons + ", Engine: " + engine);
                 }
@@ -286,6 +304,7 @@ public class FleetDisplay implements ActionListener {
 
         addShip.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                //Allows user to enter new Ship Information
                 String currentShipID = JOptionPane.showInputDialog(null, "Enter Ship ID:");
                 String currentShipType = JOptionPane.showInputDialog(null, "Enter Ship Type:");
                 String currentShipLoc = JOptionPane.showInputDialog(null, "Enter Ship Location:");
@@ -297,14 +316,17 @@ public class FleetDisplay implements ActionListener {
                     currentFleetID = Integer.parseInt(fleetList.getSelectedValue());
                 }
 
+                //Executes SQL Statement To Add a New Ship
                 try {
                     Statement stmt = m_dbConn.createStatement();
                     String add = "INSERT INTO SHIP" +
                             "(ShipOwner_ID, Resources, Ship_ID, Location, Type, " +
                             "Speed, Cargo_Tech, Hull_Tech, Weapons_Tech, " +
                             "Engine_Tech, Fl_ID) VALUES ('" + newPlayerID + "','" + 0 +
-                            "','" + currentShipID + "','" + currentShipType + "','" +
-                            currentShipLoc + "','1','1','1','1','1','" + currentFleetID + "')";
+                            "','" + currentShipID + "','" + currentShipLoc + "','" +
+                            currentShipType + "','1','1','1','1','1','" + currentFleetID + "')";
+                    stmt.execute(add);
+                    stmt.close();
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                 }
@@ -327,12 +349,38 @@ public class FleetDisplay implements ActionListener {
 
                     try {
                         Statement stmt = m_dbConn.createStatement();
-                        String delete = "DELETE FROM SHIP WHERE Ship_ID=" + shipList.getSelectedValue();
+                        String delete = "DELETE FROM SHIP WHERE Ship_ID='" + currentShipID + "'";
                         stmt.execute(delete);
                         stmt.close();
                     } catch (SQLException ex) {
                         ex.printStackTrace();
                     }
+                }
+            }
+        });
+
+        /*
+         * MOVE SHIP BUTTON********************************************************************
+         */
+        JButton moveShip = new JButton("  Move Ship ");
+
+        moveShip.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String currentShipID = "";
+                String loc = JOptionPane.showInputDialog(null, "Enter New Location:");
+
+                if (shipList.getSelectedIndex() != -1) {
+                    currentShipID = shipList.getSelectedValue();
+                }
+
+                try {
+                    Statement stmt = m_dbConn.createStatement();
+                    String move = "UPDATE SHIP SET Location=('" +
+                            loc + "') WHERE Ship_ID=" + currentShipID;
+                    stmt.execute(move);
+                    stmt.close();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
                 }
             }
         });
@@ -350,6 +398,7 @@ public class FleetDisplay implements ActionListener {
         shipButtons.add(selectShip);
         shipButtons.add(addShip);
         shipButtons.add(deleteShip);
+        shipButtons.add(moveShip);
         controlPanel.add(shipsTable);
         controlPanel.add(shipButtons);
 
