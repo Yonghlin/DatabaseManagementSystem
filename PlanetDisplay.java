@@ -76,8 +76,8 @@ public class PlanetDisplay implements ActionListener {
     CallableStatement planetProcedure = m_dbConn.prepareCall(sqlPlanet);
 
     String planets = new String("SELECT * FROM PLANET");
-    stmt.execute(planets);
-    ResultSet set = stmt.getResultSet();
+    planetProcedure.execute(planets);
+    ResultSet set = planetProcedure.getResultSet();
     while (set.next()) {
       planetName.addElement(set.getString("Planet_ID"));
     }
@@ -123,9 +123,8 @@ public class PlanetDisplay implements ActionListener {
               NumBuilding = set.getString("Num_Of_Buildings");
             }
 
-            data = "Planet_ID: " + planetID + ", StarSystem: " + Star
-                + ", Resources: " + Resource + ", PlanetOwner_ID: " + PlanetOwner + ", Number of Buildings: "
-                + NumBuilding;
+            data = "Planet_ID: " + planetID + ", StarSystem: " + Star + ", Resources: " + Resource
+                + ", PlanetOwner_ID: " + PlanetOwner + ", Number of Buildings: " + NumBuilding;
             headerLabel.setText("Showing Planet " + planetList.getSelectedValue() + " attributes");
           } catch (SQLException ex) {
             ex.printStackTrace();
@@ -217,11 +216,11 @@ public class PlanetDisplay implements ActionListener {
 
         try {
           Statement stmt = m_dbConn.createStatement();
-          String add = new String("INSERT INTO PLANET"
-              + "(Planet_ID, Star_System, Resources, PlanetOwner_ID, Num_Of_Buildings) VALUES ('" + Planet_ID + "','"
-              + Star_System + "','" + Resources + "','" + PlanetOwner_ID + "','" + Number_Of_Buildings + "')");
-
-          stmt.execute(add);
+          String add = new String("insert INTO PLANET" + "(Planet_ID, Star_System, Resources, PlanetOwner_ID, "
+              + "Num_Of_Buildings) VALUES ('" + Planet_ID + "','" + Star_System + "','" + Resources + "','"
+              + PlanetOwner_ID + "','" + Number_Of_Buildings + "')");
+          stmt.executeUpdate(add);
+          stmt.close();
         } catch (SQLException ex) {
           ex.printStackTrace();
         }
@@ -248,8 +247,10 @@ public class PlanetDisplay implements ActionListener {
 
           try {
             Statement stmt = m_dbConn.createStatement();
+            
+            
             String delete = "DELETE FROM PLANET WHERE Planet_ID=" + planetList.getSelectedValue();
-            stmt.execute(delete);
+            stmt.executeUpdate(delete);
             stmt.close();
           } catch (SQLException ex) {
             ex.printStackTrace();
