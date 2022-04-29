@@ -253,7 +253,7 @@ public class AdminDisplay implements ActionListener {
 			          	 }
 		                      
 		                     
-		                     data = ("New "+ editButton.getSelectedItem().toString() +" value is " + title + " for player " + playerName);
+		                     data = ("New "+ editButton.getSelectedItem().toString() +" value is " + title + " for player " + playerList.getSelectedValue());
 		                     statusLabel.setText(data);
 		          	  }
 		            
