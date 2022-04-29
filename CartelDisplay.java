@@ -120,7 +120,6 @@ public class CartelDisplay implements ActionListener {
 			public void actionPerformed(ActionEvent e) {
 				int currentPlayer = 0;
 				if (playerList.getSelectedIndex() != -1) {
-					int index = playerList.getSelectedIndex();
 					currentPlayer = playerList.getSelectedIndex();
 					String playerDeleted = "Player deleted: " + playerList.getSelectedValue();
 					try {
@@ -131,8 +130,8 @@ public class CartelDisplay implements ActionListener {
 					} catch (SQLException ex) {
 						ex.printStackTrace();
 					}
-					playerName.removeElementAt(index);
-					messageBoardName.removeElementAt(index);
+					playerName.removeElementAt(currentPlayer);
+					messageBoardName.removeElementAt(currentPlayer);
 					statusLabel.setText(playerDeleted);
 				}
 			}
@@ -197,9 +196,23 @@ public class CartelDisplay implements ActionListener {
 		JButton addCartelButton = new JButton("Add Cartel");
 		addCartelButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String title = JOptionPane.showInputDialog(null, "Enter cartel name:");
-				System.out.println("Title is:" + title);
-				cartelName.addElement(title);
+				String cartel = JOptionPane.showInputDialog(null, "Enter cartel name:");
+				String messageBoard = JOptionPane.showInputDialog(null, "Enter message board:");
+				String numOfMembers = JOptionPane.showInputDialog(null, "Enter number of members:");
+				System.out.println("Cartel added:" + cartel);
+				cartelName.addElement(cartel);
+				
+        try {
+            Statement stmt = m_dbConn.createStatement();
+            String addCartel = "INSERT INTO CARTEL" +
+                    "(Cartel_ID, Message_Board, Num_Of_Members) " +
+                    "VALUES ('" + cartel + "','" + messageBoard + "','" + 
+                    numOfMembers + "')";
+            stmt.execute(addCartel);
+            stmt.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
 			}
 		});
 		
@@ -208,12 +221,19 @@ public class CartelDisplay implements ActionListener {
 			public void actionPerformed(ActionEvent e) {
 				String data = "";
 				if (cartelList.getSelectedIndex() != -1) {
-					int index = cartelList.getSelectedIndex();
+					int currentCartel = cartelList.getSelectedIndex();
 					data = "Cartel deleted: " + cartelList.getSelectedValue();
-					cartelName.removeElementAt(index);
+					try {
+						Statement stmt = m_dbConn.createStatement();
+						String deleteCartel = "DELETE FROM CARTEL WHERE Cartel_ID='" + currentCartel + "'";
+						stmt.execute(deleteCartel);
+						stmt.close();
+					} catch (SQLException ex) {
+						ex.printStackTrace();
+					}
+					cartelName.removeElementAt(currentCartel);
 					statusLabel.setText(data);
 				}
-				statusLabel.setText(data);
 			}
 		});
 
