@@ -3,6 +3,20 @@ import java.text.DecimalFormat;
 import java.util.Random;
 import java.util.Scanner;
 
+/**
+ * Brennan Mulligan
+ * Group 4
+ * 4/28/2022, Database Management Systems
+ * Dr. Girard
+ * BCM, My work is my own
+ *
+ * BuildTable is a application that allows the user
+ * to interact with the CSC471_12 Database of
+ * Shippensburg University. For the purpose of the
+ * Programming Assigment 2, this helps create/drop/fill
+ * the necessary tables that Group 4 has designed.
+ */
+
 public class BuildTable {
   public BuildTable() throws SQLException {
   }
@@ -109,7 +123,7 @@ public class BuildTable {
     createTable = new String("CREATE TABLE SHIP" +
             "(ShipOwner_ID varchar(15) NOT NULL, Resources int NOT NULL, " +
             "Ship_ID int NOT NULL, Location varchar(25) NOT NULL, " +
-            "Type char(10), Speed int NOT NULL, Cargo_Tech int NOT NULL, " +
+            "Type char(15), Speed int NOT NULL, Cargo_Tech int NOT NULL, " +
             "Hull_Tech int NOT NULL, Weapons_Tech int NOT NULL, " +
             "Engine_Tech int NOT NULL, Fl_ID int NOT NULL, " +
             "PRIMARY KEY(Ship_ID, Fl_ID), " +
@@ -251,9 +265,9 @@ public class BuildTable {
               "Speed, Cargo_Tech, Hull_Tech, Weapons_Tech, " +
               "Engine_Tech, Fl_ID) VALUES ('" + Player_Name + "','" +
               rand.nextInt(100) + "','" + rand.nextInt(10000) + "','" +
-              randString() + "','" + randString() + "','" + rand.nextInt() + "','" +
-              rand.nextInt() + "','" + rand.nextInt() + "','" +
-              rand.nextInt() + "','" + rand.nextInt() + "','" + Fleet_ID + "')");
+              randString() + "','" + randString() + "','" + rand.nextInt(100) + "','" +
+              rand.nextInt(100) + "','" + rand.nextInt(100) + "','" +
+              rand.nextInt(100) + "','" + rand.nextInt(100) + "','" + Fleet_ID + "')");
       stmt.executeUpdate(insertData);
 
       insertData = new String("INSERT INTO PLANET" +
