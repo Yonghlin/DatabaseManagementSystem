@@ -9,7 +9,10 @@ import javax.swing.*;
 import java.sql.*;
 import java.text.DecimalFormat;
 
-
+/*
+ * Author: Mason Weyant
+ * AdminDisplay.java
+ */
 public class AdminDisplay implements ActionListener {
   private JFrame mainFrame;
   private JLabel headerLabel;
