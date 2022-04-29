@@ -40,7 +40,7 @@ public class PlanetDisplay implements ActionListener {
 
   public PlanetDisplay() throws SQLException {
     mainFrame = new JFrame("Planet Display");
-    mainFrame.setSize(400, 400);
+    mainFrame.setSize(1000, 600);
     mainFrame.setLayout(new GridLayout(3, 1));
 
     mainFrame.addWindowListener(new WindowAdapter() {
@@ -51,7 +51,7 @@ public class PlanetDisplay implements ActionListener {
 
     headerLabel = new JLabel("", JLabel.CENTER);
     statusLabel = new JLabel("", JLabel.CENTER);
-    statusLabel.setSize(350, 100);
+    statusLabel.setSize(1000, 1000);
 
     controlPanel = new JPanel();
     controlPanel.setLayout(new FlowLayout());
@@ -79,7 +79,7 @@ public class PlanetDisplay implements ActionListener {
     stmt.execute(planets);
     ResultSet set = stmt.getResultSet();
     while (set.next()) {
-      planetName.addElement(set.getString("PlanetOwner_ID"));
+      planetName.addElement(set.getString("Planet_ID"));
     }
 
     final JList<String> planetList = new JList<String>(planetName);
@@ -88,19 +88,63 @@ public class PlanetDisplay implements ActionListener {
     planetList.setVisibleRowCount(6);
     planetList.setPreferredSize(new Dimension(100, 200));
 
-    String data = (planetList.getModel()).getElementAt(0);
-    planetProcedure.setString(1, data);
-    planetProcedure.execute();
-    set = planetProcedure.getResultSet();
-
     JScrollPane ListScrollPane = new JScrollPane(planetList);
+
+    /*
+     * SHOW********************************************************************
+     */
+    JButton showButton = new JButton("Show Attributes");
+
+    showButton.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        String data = "";
+
+        if (planetList.getSelectedIndex() != -1) {
+
+          try {
+            Statement stmt = m_dbConn.createStatement();
+
+            String view = new String(
+                "SELECT * FROM PLANET WHERE Planet_ID = " + "'" + planetList.getSelectedValue() + "'");
+            stmt.execute(view);
+            ResultSet set = stmt.getResultSet();
+
+            String planetID = "";
+            String Star = "";
+            String Resource = "";
+            String PlanetOwner = "";
+            String NumBuilding = "";
+
+            while (set.next()) {
+              planetID = set.getString("Planet_ID");
+              Star = set.getString("Star_System");
+              Resource = set.getString("Resources");
+              PlanetOwner = set.getString("PlanetOwner_ID");
+              NumBuilding = set.getString("Num_Of_Buildings");
+            }
+
+            data = "Planet_ID: " + planetID + ", StarSystem: " + Star
+                + ", Resources: " + Resource + ", PlanetOwner_ID: " + PlanetOwner + ", Number of Buildings: "
+                + NumBuilding;
+            headerLabel.setText("Showing Planet " + planetList.getSelectedValue() + " attributes");
+          } catch (SQLException ex) {
+            ex.printStackTrace();
+          }
+          statusLabel.setText(data);
+
+        }
+
+        statusLabel.setText(data);
+
+      }
+    });
 
     /*
      * EDIT
      * BUTTON********************************************************************
      */
 
-    JButton editButton = new JButton("Edit");
+    JButton editButton = new JButton("Edit Planet");
 
     editButton.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
@@ -109,41 +153,47 @@ public class PlanetDisplay implements ActionListener {
           data = "Planet Selected: " + planetList.getSelectedValue();
           statusLabel.setText(data);
 
-          JFrame sideFrame = new JFrame(planetList.getSelectedValue());
-          sideFrame.setSize(400, 400);
-          sideFrame.setLayout(new GridLayout(3, 1));
+          JFrame editFrame = new JFrame("Edit " + planetList.getSelectedValue());
 
-          final DefaultListModel<String> planetID = new DefaultListModel<String>();
+          String[] attributes = { "Planet_ID", "Star_System", "Resources", "PlanetOwner_ID", "Num_Of_Buildings" };
+          JComboBox editButton = new JComboBox(attributes);
 
-          planetID.addElement("123456");
-          planetID.addElement("420420");
+          JLabel changeValue = new JLabel("Choose attribute to change ");
 
-          final JList<String> IDList = new JList<String>(planetID);
-          IDList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-          IDList.setSelectedIndex(1);
-          IDList.setVisibleRowCount(6);
-          IDList.setPreferredSize(new Dimension(100, 200));
+          editFrame.add(changeValue);
+          editFrame.add(editButton);
+          editFrame.setSize(400, 400);
+          editFrame.setLayout(new GridLayout(3, 1));
+          editFrame.setVisible(true);
 
-          JScrollPane IDScrollPane = new JScrollPane(IDList);
-
-          JButton deleteButton = new JButton("delete");
-
-          deleteButton.addActionListener(new ActionListener() {
+          editButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
               String data = "";
-              if (IDList.getSelectedIndex() != -1) {
-                int index = IDList.getSelectedIndex();
-                data = "Planet Deleted: " + IDList.getSelectedValue();
-                planetID.removeElementAt(index);
+              if (editButton.getSelectedIndex() != -1) {
+                String title = JOptionPane.showInputDialog(null,
+                    "Enter new value for " + editButton.getSelectedItem().toString() + ": ");
+
+                // SQL statement to change value to new value
+                try {
+                  Statement stmt = m_dbConn.createStatement();
+
+                  String updateValue = "UPDATE PLANET SET " + editButton.getSelectedItem().toString() + "=" + "'"
+                      + title + "'" + "WHERE Planet_ID =" + "'" + planetList.getSelectedValue() + "'";
+                  stmt.execute(updateValue);
+                  stmt.close();
+
+                  statusLabel.setText(data);
+                } catch (SQLException ex) {
+                  ex.printStackTrace();
+                }
+
+                data = ("The new value for " + editButton.getSelectedItem().toString() + " is " + title + " for Planet "
+                    + planetList.getSelectedValue());
                 statusLabel.setText(data);
               }
+
             }
           });
-
-          sideFrame.add(IDScrollPane);
-          sideFrame.add(deleteButton);
-          sideFrame.setLayout(new FlowLayout());
-          sideFrame.setVisible(true);
         }
       }
     });
@@ -151,16 +201,31 @@ public class PlanetDisplay implements ActionListener {
      * ADD
      * BUTTON********************************************************************
      */
-    JButton addButton = new JButton("add");
+    JButton addButton = new JButton("Add new Planet info");
 
     addButton.addActionListener(new ActionListener() {
-      String data = "";
-
       public void actionPerformed(ActionEvent e) {
-        String title = JOptionPane.showInputDialog(null, "Enter planet name:");
-        planetName.addElement(title);
-        data = "Planet Added: " + title;
+        String Planet_ID = JOptionPane.showInputDialog(null, "Enter Planet ID (4 digits):");
+        String Star_System = JOptionPane.showInputDialog(null, "Enter Star System (1 digit):");
+        String Resources = JOptionPane.showInputDialog(null, "Enter Resource:");
+        String PlanetOwner_ID = JOptionPane.showInputDialog(null, "Enter Planet Owner ID (9 chars):");
+        String Number_Of_Buildings = JOptionPane.showInputDialog(null, "Enter Number of Buildings (2 digits):");
+
+        planetName.addElement(Planet_ID);
+        String data = "Planet Added: " + Planet_ID;
         statusLabel.setText(data);
+
+        try {
+          Statement stmt = m_dbConn.createStatement();
+          String add = new String("INSERT INTO PLANET"
+              + "(Planet_ID, Star_System, Resources, PlanetOwner_ID, Num_Of_Buildings) VALUES ('" + Planet_ID + "','"
+              + Star_System + "','" + Resources + "','" + PlanetOwner_ID + "','" + Number_Of_Buildings + "')");
+
+          stmt.execute(add);
+        } catch (SQLException ex) {
+          ex.printStackTrace();
+        }
+
       }
     });
 
@@ -169,21 +234,33 @@ public class PlanetDisplay implements ActionListener {
      * BUTTON***********************************************************************
      * *******
      */
-    JButton deleteButton = new JButton("delete");
+    JButton deleteButton = new JButton("Delete");
 
     deleteButton.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         String data = "";
         if (planetList.getSelectedIndex() != -1) {
+
           int index = planetList.getSelectedIndex();
           data = "Planet Deleted: " + planetList.getSelectedValue();
           planetName.removeElementAt(index);
           statusLabel.setText(data);
+
+          try {
+            Statement stmt = m_dbConn.createStatement();
+            String delete = "DELETE FROM PLANET WHERE Planet_ID=" + planetList.getSelectedValue();
+            stmt.execute(delete);
+            stmt.close();
+          } catch (SQLException ex) {
+            ex.printStackTrace();
+          }
+
         }
       }
     });
 
     controlPanel.add(ListScrollPane);
+    controlPanel.add(showButton);
     controlPanel.add(editButton);
     controlPanel.add(addButton);
     controlPanel.add(deleteButton);
