@@ -78,7 +78,7 @@ public class CartelDisplay implements ActionListener {
     
 		final DefaultListModel<String> cartelName = new DefaultListModel<String>();
 		final DefaultListModel<String> playerName = new DefaultListModel<String>();
-		final DefaultListModel<String> selectedPlayerName = new DefaultListModel<String>();
+		final DefaultListModel<String> messageBoardName = new DefaultListModel<String>();
 		
 		String cartelGetter = "CALL cartel_info(?)";
 		@SuppressWarnings("unused")
@@ -107,34 +107,44 @@ public class CartelDisplay implements ActionListener {
 		
 		JScrollPane ListPlayerScrollPane = new JScrollPane(playerList);
 		
-		final JList<String> selectedPlayerList = new JList<String>(selectedPlayerName);
-		playerList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		playerList.setSelectedIndex(1);
-		playerList.setVisibleRowCount(6);
-		playerList.setPreferredSize(new Dimension(100, 200));
+		final JList<String> messagesList = new JList<String>(messageBoardName);
+		messagesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		messagesList.setSelectedIndex(1);
+		messagesList.setVisibleRowCount(6);
+		messagesList.setPreferredSize(new Dimension(100, 200));
 		
-		JScrollPane ListSelectedPlayerScrollPane = new JScrollPane(selectedPlayerList);
+		JScrollPane ListSelectedPlayerScrollPane = new JScrollPane(messagesList);
 		
 		JButton deletePlayerButton = new JButton("Delete Player");
 		deletePlayerButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String data = "";
+				int currentPlayer = 0;
 				if (playerList.getSelectedIndex() != -1) {
 					int index = playerList.getSelectedIndex();
-					data = "Player deleted: " + playerList.getSelectedValue();
+					currentPlayer = playerList.getSelectedIndex();
+					String playerDeleted = "Player deleted: " + playerList.getSelectedValue();
+					try {
+						Statement stmt = m_dbConn.createStatement();
+						String deletePlayer = "DELETE FROM PLAYER WHERE Player_Name='" + currentPlayer + "'";
+						stmt.execute(deletePlayer);
+						stmt.close();
+					} catch (SQLException ex) {
+						ex.printStackTrace();
+					}
 					playerName.removeElementAt(index);
-					selectedPlayerName.removeElementAt(index);
-					statusLabel.setText(data);
+					messageBoardName.removeElementAt(index);
+					statusLabel.setText(playerDeleted);
 				}
-				statusLabel.setText(data);
 			}
 		});
-		
-		JButton showPlayerButton = new JButton("Show Selected Player");
-		showPlayerButton.addActionListener(new ActionListener() {
+			   
+		JButton sendMessagesButton = new JButton("Send Messages");
+		sendMessagesButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (playerList.getSelectedIndex() != -1) {
-					selectedPlayerName.addElement(playerList.getSelectedValue());
+					String message = JOptionPane.showInputDialog(null, "Enter message:");
+					System.out.println("Message sent:" + message);
+					messageBoardName.addElement(message);
 				}
 			}
 		});
@@ -142,9 +152,25 @@ public class CartelDisplay implements ActionListener {
 		JButton addPlayerButton = new JButton("Add Player");
 		addPlayerButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String title = JOptionPane.showInputDialog(null, "Enter player name:");
-				System.out.println("Title is:" + title);
-				playerName.addElement(title);
+				String player_name = JOptionPane.showInputDialog(null, "Enter player name:");
+				String money = JOptionPane.showInputDialog(null, "Enter money:");
+				String resources = JOptionPane.showInputDialog(null, "Enter resources:");
+				String player_cartel = JOptionPane.showInputDialog(null, "Enter cartel ID:");
+				String orders = JOptionPane.showInputDialog(null, "Enter orders");
+				System.out.println("Player added:" + player_name);
+				playerName.addElement(player_name);
+				
+        try {
+            Statement stmt = m_dbConn.createStatement();
+            String addPlayer = "INSERT INTO PLAYER" +
+                    "(Player_Name, Money, Resources, PlCartel_ID, PlOrders) " +
+                    "VALUES ('" + player_name + "','" + money + "','" + resources + "','" +
+                    player_cartel + "','" + orders + "')";
+            stmt.execute(addPlayer);
+            stmt.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
 			}
 		});
 		
@@ -152,6 +178,7 @@ public class CartelDisplay implements ActionListener {
 		showSelectedCartelButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (cartelList.getSelectedIndex() != -1) {
+					playerName.removeAllElements();
 					String players = new String("SELECT * FROM PLAYER WHERE PlCartel_ID='" + cartelList.getSelectedValue()) + "'";
 			    try {
 						stmt.execute(players);
@@ -196,9 +223,9 @@ public class CartelDisplay implements ActionListener {
 		controlPanel.add(deleteCartelButton);
 		controlPanel.add(ListPlayerScrollPane);
 		controlPanel.add(addPlayerButton);
-		controlPanel.add(showPlayerButton);
-		controlPanel.add(ListSelectedPlayerScrollPane);
 		controlPanel.add(deletePlayerButton);
+		controlPanel.add(ListSelectedPlayerScrollPane);
+		controlPanel.add(sendMessagesButton);
 		
 		mainFrame.setVisible(true);
 	}
