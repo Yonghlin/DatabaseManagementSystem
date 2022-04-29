@@ -124,7 +124,7 @@ public class CartelDisplay implements ActionListener {
 					String playerDeleted = "Player deleted: " + playerList.getSelectedValue();
 					try {
 						Statement stmt = m_dbConn.createStatement();
-						String deletePlayer = "DELETE FROM PLAYER WHERE Player_Name='" + currentPlayer + "'";
+						String deletePlayer = "DELETE FROM PLAYER WHERE Player_Name='" + playerList.getSelectedValue() + "'";
 						stmt.execute(deletePlayer);
 						stmt.close();
 					} catch (SQLException ex) {
@@ -225,7 +225,7 @@ public class CartelDisplay implements ActionListener {
 					data = "Cartel deleted: " + cartelList.getSelectedValue();
 					try {
 						Statement stmt = m_dbConn.createStatement();
-						String deleteCartel = "DELETE FROM CARTEL WHERE Cartel_ID='" + currentCartel + "'";
+						String deleteCartel = "DELETE FROM CARTEL WHERE Cartel_ID='" + cartelList.getSelectedValue() + "'";
 						stmt.execute(deleteCartel);
 						stmt.close();
 					} catch (SQLException ex) {
