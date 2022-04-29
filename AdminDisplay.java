@@ -101,7 +101,7 @@ public class AdminDisplay implements ActionListener {
            
           try {
               Statement stmt = m_dbConn.createStatement();
-              
+              //SQL statement that will select a row of data from the table PLAYER
               String view = new String ("SELECT Player_Name, Money, Resources, PlCartel_ID, PlOrders FROM PLAYER WHERE Player_Name = " + "'"+playerList.getSelectedValue()+"'");
               stmt.execute(view);
               ResultSet set = stmt.getResultSet();
@@ -153,6 +153,7 @@ public class AdminDisplay implements ActionListener {
          try {
              	DecimalFormat df = new DecimalFormat("#.00");
           	Statement stmt = m_dbConn.createStatement();
+            //SQL statement that will insert a player and its attributes into the table PLAYER 
           	String add = new String ("INSERT INTO PLAYER" + 
          		"(PLAYER_NAME, Money, Resources, PlCartel_ID, PlOrders) VALUES ('" + currentPlayerName + "','" +
          		currentPlayerMoney  + "','" + currentPlayerResources + "','" + currentPlayerCartelID + "','" + currentPlayerOrders + "')");	
@@ -213,7 +214,7 @@ public class AdminDisplay implements ActionListener {
  * EDIT BUTTON
  */   
     
-    String[] attributes = {"Player_Name", "Money", "Resources", "PlCartel_ID", "PlOrders"}; //will be SQL to see current players attributes
+    String[] attributes = {"Player_Name", "Money", "Resources", "PlCartel_ID", "PlOrders"}; 
     JComboBox editButton = new JComboBox(attributes);
     
     
