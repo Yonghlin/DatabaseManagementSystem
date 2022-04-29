@@ -5,10 +5,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import javax.swing.*;
 
@@ -38,7 +41,7 @@ public class CartelDisplay implements ActionListener {
 	private JLabel statusLabel;
 	private JPanel controlPanel;
 	
-	public CartelDisplay() {
+	public CartelDisplay() throws SQLException {
 		mainFrame = new JFrame("Cartel Display");
 		mainFrame.setSize(700, 700);
 		mainFrame.setLayout(new GridLayout(3, 1));
@@ -60,14 +63,33 @@ public class CartelDisplay implements ActionListener {
 	}
 
 	public static void main(String args[]) {
-		CartelDisplay database = new CartelDisplay();
-		database.runDemo();
+		CartelDisplay database;
+		try {
+			database = new CartelDisplay();
+			database.runDemo();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
-	private void runDemo() {
+	private void runDemo() throws SQLException {
+		Statement stmt = m_dbConn.createStatement();
+    
 		final DefaultListModel<String> cartelName = new DefaultListModel<String>();
-		cartelName.addElement("Cartel 1");
-		cartelName.addElement("Cartel 2");
+		final DefaultListModel<String> playerName = new DefaultListModel<String>();
+		final DefaultListModel<String> selectedPlayerName = new DefaultListModel<String>();
+		
+		String cartelGetter = "CALL cartel_info(?)";
+		@SuppressWarnings("unused")
+		CallableStatement cartelProcedure = m_dbConn.prepareCall(cartelGetter);
+		
+	  String cartels = new String("SELECT * FROM CARTEL");
+    stmt.execute(cartels);
+    ResultSet setCartel = stmt.getResultSet();
+    while(setCartel.next()) {
+        cartelName.addElement(setCartel.getString("Cartel_ID"));
+    }
 		
 		final JList<String> cartelList = new JList<String>(cartelName);
 		cartelList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -76,12 +98,8 @@ public class CartelDisplay implements ActionListener {
 		cartelList.setPreferredSize(new Dimension(100, 200));
 
 		JScrollPane ListScrollPane = new JScrollPane(cartelList);
-
-		DefaultListModel<String> playerName = new DefaultListModel<String>();
-		playerName.addElement("Player 1");
-		playerName.addElement("Player 2");
 		
-		JList<String> playerList = new JList<String>(playerName);
+		final JList<String> playerList = new JList<String>(playerName);
 		playerList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		playerList.setSelectedIndex(1);
 		playerList.setVisibleRowCount(6);
@@ -89,9 +107,7 @@ public class CartelDisplay implements ActionListener {
 		
 		JScrollPane ListPlayerScrollPane = new JScrollPane(playerList);
 		
-		DefaultListModel<String> selectedPlayerName = new DefaultListModel<String>();
-		
-		JList<String> selectedPlayerList = new JList<String>(selectedPlayerName);
+		final JList<String> selectedPlayerList = new JList<String>(selectedPlayerName);
 		playerList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		playerList.setSelectedIndex(1);
 		playerList.setVisibleRowCount(6);
@@ -136,7 +152,17 @@ public class CartelDisplay implements ActionListener {
 		showSelectedCartelButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (cartelList.getSelectedIndex() != -1) {
-					playerName.addElement(cartelList.getSelectedValue());
+					String players = new String("SELECT * FROM PLAYER WHERE PlCartel_ID='" + cartelList.getSelectedValue()) + "'";
+			    try {
+						stmt.execute(players);
+						ResultSet setPlayers = stmt.getResultSet();
+				    while(setPlayers.next()) {
+				        playerName.addElement(setPlayers.getString("Player_Name"));
+				    }
+				    } catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 				}
 			}
 		});
